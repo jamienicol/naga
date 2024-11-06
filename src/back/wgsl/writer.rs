@@ -1571,7 +1571,7 @@ impl<W: Write> Writer<W> {
                         return Err(Error::UnsupportedMathFunction(fun));
                     }
                     // FIXME: move to correct category
-                    Mf::QuantizeToF16 => todo!(),
+                    Mf::QuantizeToF16 => Function::Regular("quantizeToF16"),
                 };
 
                 match function {
