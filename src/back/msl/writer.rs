@@ -2,9 +2,8 @@ use super::{sampler as sm, Error, LocationMode, Options, PipelineOptions, Transl
 use crate::{
     arena::Handle,
     back,
-    proc::index,
-    proc::{self, NameKey, TypeResolution},
-    valid, FastHashMap, FastHashSet,
+    proc::{self, index, NameKey, TypeResolution},
+    valid, FastHashMap, FastHashSet, VectorSize,
 };
 use bit_set::BitSet;
 use std::{
@@ -1789,7 +1788,7 @@ impl<W: Write> Writer<W> {
                     Mf::Unpack2x16unorm => "unpack_unorm2x16_to_float",
                     Mf::Unpack2x16float => "",
                     // FIXME: move to correct category
-                    Mf::QuantizeToF16 => todo!(),
+                    Mf::QuantizeToF16 => "",
                 };
 
                 match fun {
@@ -1882,6 +1881,20 @@ impl<W: Write> Writer<W> {
                 } else if fun == Mf::Modf || fun == Mf::Frexp {
                     write!(self.out, "{fun_name}")?;
                     self.put_call_parameters(iter::once(arg), context)?;
+                } else if fun == Mf::QuantizeToF16 {
+                    let size = match *context.resolve_type(arg) {
+                        crate::TypeInner::Scalar { .. } => "",
+                        crate::TypeInner::Vector { size, .. } => back::vector_size_str(size),
+                        _ => unreachable!(
+                            "Correct TypeInner for QuantizeToF16 should be already validated"
+                        ),
+                    };
+                    write!(
+                        self.out,
+                        "{NAMESPACE}::float{size}({NAMESPACE}::half{size}("
+                    )?;
+                    self.put_expression(arg, context, true)?;
+                    write!(self.out, "))")?;
                 } else {
                     write!(self.out, "{NAMESPACE}::{fun_name}")?;
                     self.put_call_parameters(
