@@ -3289,6 +3289,8 @@ impl<'a, W: Write> Writer<'a, W> {
                     Mf::Unpack2x16snorm => "unpackSnorm2x16",
                     Mf::Unpack2x16unorm => "unpackUnorm2x16",
                     Mf::Unpack2x16float => "unpackHalf2x16",
+                    // FIXME: move to correct category
+                    Mf::QuantizeToF16 => todo!(),
                 };
 
                 let extract_bits = fun == Mf::ExtractBits;

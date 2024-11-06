@@ -219,6 +219,8 @@ pub fn map_standard_fun(word: &str) -> Option<crate::MathFunction> {
         "unpack2x16snorm" => Mf::Unpack2x16snorm,
         "unpack2x16unorm" => Mf::Unpack2x16unorm,
         "unpack2x16float" => Mf::Unpack2x16float,
+        // FIXME: move to correct category
+        "quantizeToF16" => Mf::QuantizeToF16,
         _ => return None,
     })
 }

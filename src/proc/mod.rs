@@ -434,6 +434,8 @@ impl super::MathFunction {
             Self::Unpack2x16snorm => 1,
             Self::Unpack2x16unorm => 1,
             Self::Unpack2x16float => 1,
+            // FIXME: move to correct category
+            Self::QuantizeToF16 => 1,
         }
     }
 }

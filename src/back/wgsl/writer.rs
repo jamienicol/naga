@@ -1570,6 +1570,8 @@ impl<W: Write> Writer<W> {
                     Mf::Inverse | Mf::Outer => {
                         return Err(Error::UnsupportedMathFunction(fun));
                     }
+                    // FIXME: move to correct category
+                    Mf::QuantizeToF16 => todo!(),
                 };
 
                 match function {

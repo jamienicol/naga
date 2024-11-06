@@ -1204,6 +1204,8 @@ pub enum MathFunction {
     Unpack2x16snorm,
     Unpack2x16unorm,
     Unpack2x16float,
+    // FIXME: put in correct category
+    QuantizeToF16,
 }
 
 /// Sampling modifier to control the level of detail.

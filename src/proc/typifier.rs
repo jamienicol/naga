@@ -848,6 +848,18 @@ impl<'a> ResolveContext<'a> {
                     Mf::Unpack2x16snorm |
                     Mf::Unpack2x16unorm |
                     Mf::Unpack2x16float => TypeResolution::Value(Ti::Vector { size: crate::VectorSize::Bi, kind: crate::ScalarKind::Float, width: 4 }),
+                    // FIXME: move to correct category
+                    Mf::QuantizeToF16 => match *res_arg.inner_with(types) {
+                        Ti::Scalar { kind: crate::ScalarKind::Float, width: 4 } => TypeResolution::Value(
+                            Ti::Scalar { kind: crate::ScalarKind::Float, width: 4 }
+                        ),
+                        Ti::Vector { size, kind: crate::ScalarKind::Float, width: 4 } => TypeResolution::Value(
+                            Ti::Vector { size, kind: crate::ScalarKind::Float, width: 4 }
+                        ),
+                        ref other => return Err(ResolveError::IncompatibleOperands(
+                                format!("{fun:?}({other:?})")
+                            )),
+                    }
                 }
             }
             crate::Expression::As {

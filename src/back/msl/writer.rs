@@ -1788,6 +1788,8 @@ impl<W: Write> Writer<W> {
                     Mf::Unpack2x16snorm => "unpack_snorm2x16_to_float",
                     Mf::Unpack2x16unorm => "unpack_unorm2x16_to_float",
                     Mf::Unpack2x16float => "",
+                    // FIXME: move to correct category
+                    Mf::QuantizeToF16 => todo!(),
                 };
 
                 match fun {

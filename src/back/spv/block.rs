@@ -1057,6 +1057,8 @@ impl<'w> BlockContext<'w> {
                     Mf::Unpack2x16float => MathOp::Ext(spirv::GLOp::UnpackHalf2x16),
                     Mf::Unpack2x16unorm => MathOp::Ext(spirv::GLOp::UnpackUnorm2x16),
                     Mf::Unpack2x16snorm => MathOp::Ext(spirv::GLOp::UnpackSnorm2x16),
+                    // FIXME: move to correct category
+                    Mf::QuantizeToF16 => todo!(),
                 };
 
                 block.body.push(match math_op {
