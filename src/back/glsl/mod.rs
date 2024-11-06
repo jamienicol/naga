@@ -48,7 +48,7 @@ pub use features::Features;
 use crate::{
     back,
     proc::{self, NameKey},
-    valid, Handle, ShaderStage, TypeInner,
+    valid, Handle, ShaderStage, TypeInner, VectorSize,
 };
 use features::FeaturesManager;
 use std::{
@@ -3290,7 +3290,48 @@ impl<'a, W: Write> Writer<'a, W> {
                     Mf::Unpack2x16unorm => "unpackUnorm2x16",
                     Mf::Unpack2x16float => "unpackHalf2x16",
                     // FIXME: move to correct category
-                    Mf::QuantizeToF16 => todo!(),
+                    Mf::QuantizeToF16 => match *ctx.resolve_type(arg, &self.module.types) {
+                        crate::TypeInner::Scalar { .. } => {
+                            write!(self.out, "unpackHalf2x16(packHalf2x16(vec2(")?;
+                            self.write_expr(arg, ctx)?;
+                            write!(self.out, "))).x")?;
+                            return Ok(());
+                        }
+                        crate::TypeInner::Vector {
+                            size: crate::VectorSize::Bi,
+                            ..
+                        } => {
+                            write!(self.out, "unpackHalf2x16(packHalf2x16(")?;
+                            self.write_expr(arg, ctx)?;
+                            write!(self.out, "))")?;
+                            return Ok(());
+                        }
+                        crate::TypeInner::Vector {
+                            size: crate::VectorSize::Tri,
+                            ..
+                        } => {
+                            write!(self.out, "vec3(unpackHalf2x16(packHalf2x16(")?;
+                            self.write_expr(arg, ctx)?;
+                            write!(self.out, ".xy)), unpackHalf2x16(packHalf2x16(")?;
+                            self.write_expr(arg, ctx)?;
+                            write!(self.out, ".zz)).x)")?;
+                            return Ok(());
+                        }
+                        crate::TypeInner::Vector {
+                            size: crate::VectorSize::Quad,
+                            ..
+                        } => {
+                            write!(self.out, "vec4(unpackHalf2x16(packHalf2x16(")?;
+                            self.write_expr(arg, ctx)?;
+                            write!(self.out, ".xy)), unpackHalf2x16(packHalf2x16(")?;
+                            self.write_expr(arg, ctx)?;
+                            write!(self.out, ".zw)))")?;
+                            return Ok(());
+                        }
+                        _ => unreachable!(
+                            "Correct TypeInner for QuantizeToF16 should be already validated"
+                        ),
+                    },
                 };
 
                 let extract_bits = fun == Mf::ExtractBits;
