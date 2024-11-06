@@ -2626,6 +2626,7 @@ impl<'a, W: fmt::Write> super::Writer<'a, W> {
                     Unpack2x16unorm,
                     Unpack4x8snorm,
                     Unpack4x8unorm,
+                    QuantizeToF16,
                     Regular(&'static str),
                     MissingIntOverload(&'static str),
                     MissingIntReturnType(&'static str),
@@ -2713,6 +2714,8 @@ impl<'a, W: fmt::Write> super::Writer<'a, W> {
                     Mf::Unpack2x16unorm => Function::Unpack2x16unorm,
                     Mf::Unpack4x8snorm => Function::Unpack4x8snorm,
                     Mf::Unpack4x8unorm => Function::Unpack4x8unorm,
+                    // FIXME: move to correct location
+                    Mf::QuantizeToF16 => Function::QuantizeToF16,
                     _ => return Err(Error::Unimplemented(format!("write_expr_math {fun:?}"))),
                 };
 
@@ -2920,6 +2923,11 @@ impl<'a, W: fmt::Write> super::Writer<'a, W> {
                         write!(self.out, " >> 16 & 0xFF, ")?;
                         self.write_expr(module, arg, func_ctx)?;
                         write!(self.out, " >> 24) / {scale}.0)")?;
+                    }
+                    Function::QuantizeToF16 => {
+                        write!(self.out, "f16tof32(f32tof16((")?;
+                        self.write_expr(module, arg, func_ctx)?;
+                        write!(self.out, "))")?;
                     }
                     Function::Regular(fun_name) => {
                         write!(self.out, "{fun_name}(")?;
